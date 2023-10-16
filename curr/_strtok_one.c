@@ -12,6 +12,7 @@ char **strtok_cmd(char *command)
     const char *delim = " ";
     int i = 0;
     char *arg;
+    int j;
 
     char **args = (char **)malloc(MAX_ARGLMT * sizeof(char *));
     if (!args)
@@ -27,7 +28,7 @@ char **strtok_cmd(char *command)
         if (!args[i])
         {
             perror("Error: malloc argv[i]");
-            for (int j = 0; j < i; j++)
+            for (j = 0; j < i; j++)
             {
                 free(args[j]);
             }
