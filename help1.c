@@ -128,6 +128,27 @@ int handle_args(int *exe_ret)
     free(front);
     return ret;
 }
+int check_args(char **args)
+{
+    char *prev = NULL;
+    char *cur;
+    size_t i;
+
+    for (i = 0; args[i]; i++)
+    {
+        cur = args[i];
+        if (cur[0] == ';' || cur[0] == '&' || cur[0] == '|')
+        {
+            if (prev == NULL || cur[1] == ';' || args[i + 1] == NULL || args[i + 1][0] == ';' || args[i + 1][0] == '&' || args[i + 1][0] == '|')
+            {
+                return create_error(&args[i], 2);
+            }
+        }
+        prev = cur;
+    }
+
+    return 0;
+}
 
 
 
