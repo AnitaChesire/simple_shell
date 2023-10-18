@@ -1,9 +1,5 @@
 #include "shell.h"
 
-int shellby_env(char **args);
-int shellby_setenv(char **args);
-int shellby_unsetenv(char **args);
-
 /**
  * shellby_env - Prints the current environment.
  * @args: An array of arguments passed to the shell.
@@ -14,7 +10,7 @@ int shellby_unsetenv(char **args);
  * Description: Prints one variable per line in the
  *              format 'variable'='value'.
  */
-int shellby_env(char **args)
+int shellby_env(char **args, char __attribute__((__unused__)) **front)
 {
 	int index;
 	char nc = '\n';
@@ -40,26 +36,30 @@ int shellby_env(char **args)
  * Return: If an error occurs - -1.
  *         Otherwise - 0.
  */
-int shellby_setenv(char **args)
+int shellby_setenv(char **args, char __attribute__((__unused__)) **front)
 {
+	int index, size;
+	char **new_environ;
+	char **env_var;
+	char *new_value;
+
 	if (!args[0] || !args[1])
 	{
-		// Print an error message or handle the error as needed
-		return -1;
+		return (-1);
 	}
 
-	char *new_value = malloc(_strlen(args[0]) + 1 + _strlen(args[1]) + 1);
+	new_value = malloc(_strlen(args[0]) + 1 + _strlen(args[1]) + 1);
 	if (!new_value)
 	{
-		// Handle memory allocation error
-		return -1;
+		/* Handle memory allocation error*/
+		return (-1);
 	}
 
 	_strcpy(new_value, args[0]);
 	_strcat(new_value, "=");
 	_strcat(new_value, args[1]);
 
-	char **env_var = _getenv(args[0]);
+	env_var = _getenv(args[0]);
 	if (env_var)
 	{
 		free(*env_var);
@@ -67,22 +67,20 @@ int shellby_setenv(char **args)
 	}
 	else
 	{
-		// Add a new environment variable
-		int size = 0;
+		/* Add a new environment variable*/
+		size = 0;
 		while (environ[size] != NULL)
 		{
 			size++;
 		}
 
-		char **new_environ = malloc(sizeof(char *) * (size + 2));
+		new_environ = malloc(sizeof(char *) * (size + 2));
 		if (!new_environ)
 		{
 			free(new_value);
-			// Handle memory allocation error
-			return -1;
+			return (-1);
 		}
 
-		int index;
 		for (index = 0; index < size; index++)
 		{
 			new_environ[index] = environ[index];
@@ -95,7 +93,7 @@ int shellby_setenv(char **args)
 		environ = new_environ;
 	}
 
-	return 0;
+	return (0);
 }
 
 /**
@@ -106,32 +104,37 @@ int shellby_setenv(char **args)
  * Return: If an error occurs - -1.
  *         Otherwise - 0.
  */
-int shellby_unsetenv(char **args)
+int shellby_unsetenv(char **args, char __attribute__((__unused__)) **front)
 {
+	char **env_var;
+	int size, index, index2;
+	char **new_environ;
+
 	if (!args[0])
 	{
-		// Print an error message or handle the error as needed
+		/* Print an error message or handle the error as needed*/
 		return -1;
 	}
 
-	char **env_var = _getenv(args[0]);
+	env_var = _getenv(args[0]);
 	if (env_var)
 	{
-		// Remove the environment variable
-		int size = 0;
+		/* Remove the environment variable*/
+		size = 0;
 		while (environ[size] != NULL)
 		{
 			size++;
 		}
 
-		char **new_environ = malloc(sizeof(char *) * size);
+		new_environ = malloc(sizeof(char *) * size);
 		if (!new_environ)
 		{
-			// Handle memory allocation error
-			return -1;
+			return (-1);
 		}
 
-		int index, index2 = 0;
+		index = 0;
+		index2 = 0;
+
 		for (index = 0; index < size; index++)
 		{
 			if (*env_var == environ[index])
@@ -147,5 +150,5 @@ int shellby_unsetenv(char **args)
 		environ = new_environ;
 		environ[size - 1] = NULL;
 	}
-	return 0;
+	return (0);
 }

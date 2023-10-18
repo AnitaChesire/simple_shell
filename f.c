@@ -18,13 +18,13 @@ int cant_open(char *file_path)
     len = _strlen(name) + _strlen(file_path) + 16;
     error = malloc(sizeof(char) * (len + 1));
     if (!error) {
-        return 127; // Return an error code
+        return 127;
     }
 
     snprintf(error, len, "%s: Can't open %s\n", name, file_path);
     write(STDERR_FILENO, error, len);
     free(error);
-    return 127; // Return an error code
+    return 127;
 }
 
 /**
@@ -44,22 +44,23 @@ int proc_file_commands(char *file_path, int *exe_ret)
     unsigned int line_size = 0;
     unsigned int old_size = 120;
     char *line = NULL;
-    char buffer[121]; // Increased buffer size by 1
+    char buffer[121]; 
     int ret;
 
     hist = 0;
     file = open(file_path, O_RDONLY);
     if (file == -1) {
         *exe_ret = cant_open(file_path);
-        return *exe_ret; // Return the error code
+        return *exe_ret;
     }
 
     line = malloc(sizeof(char) * old_size);
     if (!line) {
-        return -1; // Return an error code
+        return -1;
     }
 
-    while ((b_read = read(file, buffer, 120)) > 0) { // Use a while loop for reading
+    while ((b_read = read(file, buffer, 120)) > 0) 
+    {
         buffer[b_read] = '\0';
         line_size += b_read;
         line = _realloc(line, old_size, line_size);
@@ -67,8 +68,6 @@ int proc_file_commands(char *file_path, int *exe_ret)
         old_size = line_size;
     }
 
-    // The code you provided seems to have issues, so I'm not making further changes to it.
-    
-    free(line); // Free allocated memory
-    return ret; // Return the result of command execution
+    free(line);
+    return ret;
 }

@@ -1,171 +1,141 @@
 #include "shell.h"
 
-char *get_location(const char *command);
-list_t *get_path_dir(const char *path);
-
 /**
- * custom_strjoin - Concatenates two strings with a delimiter.
- * @str1: The first string.
- * @str2: The second string.
- * @delimiter: The delimiter to insert between the strings.
+ * get_location - Locates a command in the PATH.
+ * @command: The command to locate.
  *
- * Return: A newly allocated string containing the concatenated result.
+ * Return: If an error occurs or the command cannot be located - NULL.
+ *         Otherwise - the full pathname of the command.
  */
-char *custom_strjoin(const char *str1, const char *str2, char delimiter)
+char *get_location(char *command)
 {
-    size_t len1 = _strlen(str1);
-    size_t len2 = _strlen(str2);
-    char *result = malloc(len1 + len2 + 2);
-    
-    if (result)
-    {
-        _strcpy(result, str1);
-        result[len1] = delimiter;
-        _strcpy(result + len1 + 1, str2);
-    }
-    
-    return result;
-}
-
-/**
- * custom_strsplit - Splits a string into an array of substrings based on a delimiter.
- * @str: The string to split.
- * @delimiter: The delimiter character.
- *
- * Return: An array of strings (char *) or NULL on failure.
- */
-char **custom_strsplit(const char *str, char delimiter)
-{
-    size_t i, j, k, num_tokens;
-    char **tokens = NULL;
-
-    if (str == NULL)
-        return NULL;
-
-    num_tokens = 1;
-    for (i = 0; str[i] != '\0'; i++)
-    {
-        if (str[i] == delimiter)
-            num_tokens++;
-    }
-
-    tokens = malloc(sizeof(char *) * (num_tokens + 1));
-    if (tokens == NULL)
-        return NULL;
-
-    i = 0;
-    j = 0;
-    num_tokens = 0;
-
-    while (str[i] != '\0')
-    {
-        if (str[i] == delimiter)
-        {
-            tokens[num_tokens] = malloc(j + 1);
-            if (tokens[num_tokens] == NULL)
-            {
-                for (i = 0; i < num_tokens; i++)
-                    free(tokens[i]);
-                free(tokens);
-                return NULL;
-            }
-
-            for (k = 0; k < j; k++)
-                tokens[num_tokens][k] = str[i - j + k];
-            tokens[num_tokens][j] = '\0';
-            num_tokens++;
-            j = 0;
-        }
-        else
-        {
-            j++;
-        }
-
-        i++;
-    }
-
-    tokens[num_tokens] = malloc(j + 1);
-    if (tokens[num_tokens] == NULL)
-    {
-        for (i = 0; i <= num_tokens; i++)
-            free(tokens[i]);
-        free(tokens);
-        return NULL;
-    }
-
-    for (k = 0; k < j; k++)
-        tokens[num_tokens][k] = str[i - j + k];
-    tokens[num_tokens][j] = '\0';
-
-    tokens[num_tokens + 1] = NULL;
-    return tokens;
-}
-
-char *get_location(const char *command)
-{
+	char **path, *temp;
+	list_t *dirs, *head;
 	struct stat st;
-	list_t *dirs;
-	char *temp;
-	char *path
 
-    path = _getenv("PATH");
-    if (!path || !(*path))
-        return NULL;
+	path = _getenv("PATH");
+	if (!path || !(*path))
+		return NULL;
 
-    dirs = get_path_dir(path);
+	dirs = get_path_dir(*path);
+	head = dirs;
 
-    while (dirs)
-    {
-        temp = custom_strjoin(dirs->dir, command, '/');
-        if (!temp)
-        {
-            free_list(dirs);
-            return NULL;
-        }
+	while (dirs)
+	{
+		temp = malloc(_strlen(dirs->dir) + _strlen(command) + 2);
+		if (!temp)
+		{
+			free_list(head);
+			return NULL;
+		}
 
-        
-        if (stat(temp, &st) == 0)
-        {
-            free_list(dirs);
-            return temp;
-        }
+		_strcpy(temp, dirs->dir);
+		_strcat(temp, "/");
+		_strcat(temp, command);
 
-        free(temp);
-        dirs = dirs->next;
-    }
+		if (stat(temp, &st) == 0)
+		{
+			free_list(head);
+			return temp;
+		}
 
-    free_list(dirs);
+		dirs = dirs->next;
+		free(temp);
+	}
 
-    return NULL;
+	free_list(head);
+
+	return NULL;
 }
 
-list_t *get_path_dir(const char *path)
+/**
+ * fill_path_dir - Copies path but also replaces leading/sandwiched/trailing
+ *   colons (:) with the current working directory.
+ * @path: The colon-separated list of directories.
+ *
+ * Return: A copy of path with any leading/sandwiched/trailing colons replaced
+ *   with the current working directory.
+ */
+char *fill_path_dir(char *path)
 {
-	list_t *head;
-	int index, i;
-	char **dirs;
+	int i, length = 0;
+	char *path_copy, *pwd;
 
-    dirs = custom_strsplit(path, ':');
-    if (!dirs)
-        return NULL;
+	pwd = *(_getenv("PWD")) + 4;
+	for (i = 0; path[i]; i++)
+	{
+		if (path[i] == ':')
+		{
+			if (path[i + 1] == ':' || i == 0 || path[i + 1] == '\0')
+				length += _strlen(pwd) + 1;
+			else
+				length++;
+		}
+		else
+			length++;
+	}
+	path_copy = malloc(sizeof(char) * (length + 1));
+	if (!path_copy)
+		return NULL;
+	path_copy[0] = '\0';
+	for (i = 0; path[i]; i++)
+	{
+		if (path[i] == ':')
+		{
+			if (i == 0)
+			{
+				_strcat(path_copy, pwd);
+				_strcat(path_copy, ":");
+			}
+			else if (path[i + 1] == ':' || path[i + 1] == '\0')
+			{
+				_strcat(path_copy, ":");
+				_strcat(path_copy, pwd);
+			}
+			else
+				_strcat(path_copy, ":");
+		}
+		else
+		{
+			_strncat(path_copy, &path[i], 1);
+		}
+	}
+	return path_copy;
+}
 
-    head = NULL;
+/**
+ * get_path_dir - Tokenizes a colon-separated list of
+ *                directories into a linked list.
+ * @path: The colon-separated list of directories.
+ *
+ * Return: A pointer to the initialized linked list.
+ */
+list_t *get_path_dir(char *path)
+{
+	int index;
+	char **dirs, *path_copy;
+	list_t *head = NULL;
 
-    for (index = 0; dirs[index]; index++)
-    {
-        if (add_node_end(&head, dirs[index]) == NULL)
-        {
-            free_list(head);
-            for (i = 0; dirs[i]; i++)
-                free(dirs[i]);
-            free(dirs);
-            return NULL;
-        }
-        free(dirs[index]);
-    }
+	path_copy = fill_path_dir(path);
+	if (!path_copy)
+		return NULL;
+	dirs = _strtok(path_copy, ":");
+	free(path_copy);
+	if (!dirs)
+		return NULL;
 
-    free(dirs);
+	for (index = 0; dirs[index]; index++)
+	{
+		if (add_node_end(&head, dirs[index]) == NULL)
+		{
+			free_list(head);
+			free(dirs);
+			return NULL;
+		}
+	}
 
-    return head;
+	free(dirs);
+
+	return head;
 }
 

@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <stdlib.h>

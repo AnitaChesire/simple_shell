@@ -5,92 +5,96 @@ int count_tokens(char *str, char *delim);
 char **_strtok(char *line, char *delim);
 
 /**
- * token_len - Finds the length of the token up to the delimiter.
- * @str: The string to search.
- * @delim: The delimiter character.
- *
- * Return: The length of the token up to the delimiter.
- */
-int token_len(char *str, char delim)
-{
-    int len = 0;
-    while (str[len] && str[len] != delim)
-    {
-        len++;
-    }
-    return len;
-}
-/**
- * count_tokens - Counts the number of delimited words in a string.
- * @str: The string to search.
- * @delim: The delimiter character.
- *
- * Return: The number of words in the string.
- */
-int count_tokens(char *str, char delim)
-{
-    int tokens = 0;
-    int is_token = 0;  // Flag to track if we're inside a token
-    for (int i = 0; str[i]; i++)
-    {
-        if (str[i] == delim)
-        {
-            is_token = 0; // We're outside a token
-        }
-        else if (!is_token)
-        {
-            is_token = 1; // We're inside a new token
-            tokens++;
-        }
-    }
-    return tokens;
-}
-
-/**
  * _strtok - Tokenizes a string.
  * @line: The string.
  * @delim: The delimiter character to tokenize the string by.
  *
  * Return: A pointer to an array containing the tokenized words.
  */
-char **_strtok(char *line, char delim)
+char **_strtok(char *line, char *delim)
 {
     char **ptr = NULL;
-    int t, i, letters, index = 0, tokens = 0;
+    int tokens = 0;
+    int index = 0;
+    int word_len;
 
-    tokens = count_tokens(line, delim);
-    if (tokens == 0)
-        return NULL;
-
-    ptr = malloc(sizeof(char *) * (tokens + 1));
-    if (!ptr)
-        return NULL;
-
-    t = 0;
-    while (line[index] && t < tokens)
-    {
-        while (line[index] == delim)
+    while (line[index]) {
+        while (line[index] && line[index] == *delim)
             index++;
 
-        letters = token_len(line + index, delim);
+        if (!line[index])
+            break;
 
-        ptr[t] = malloc(letters + 1);
-        if (!ptr[t])
-        {
-            for (i = 0; i < t; i++)
-                free(ptr[i]);
-            free(ptr);
-            return NULL;
+         word_len = 0;
+        while (line[index + word_len] && line[index + word_len] != *delim)
+            word_len++;
+
+        if (word_len > 0) {
+            ptr = realloc(ptr, (tokens + 1) * sizeof(char *));
+            ptr[tokens] = malloc(word_len + 1);
+            if (!ptr) 
+	    {
+                      return NULL;
+            }
+            strncpy(ptr[tokens], &line[index], word_len);
+            ptr[tokens][word_len] = '\0';
+            tokens++;
         }
 
-        strncpy(ptr[t], line + index, letters);
-        ptr[t][letters] = '\0';
-
-        index += letters;
-        t++;
+        index += word_len;
     }
 
-    ptr[t] = NULL;
+    ptr = realloc(ptr, (tokens + 1) * sizeof(char *));
+    ptr[tokens] = NULL;
+
     return ptr;
+}
+
+/**
+ * token_len - Locates the delimiter index marking the end
+ *             of the first token contained within a string.
+ * @str: The string to be searched.
+ * @delim: The delimiter character.
+ *
+ * Return: The delimiter index marking the end of
+ *         the intitial token pointed to be str.
+ */
+
+int token_len(char *str, char *delim)
+{
+    int index = 0, len = 0;
+
+    for (index = 0; str[index] && str[index] != *delim; index++) {
+        len++;
+    }
+
+    return len;
+}
+
+/**
+ * count_tokens - Counts the number of delimited
+ *                words contained within a string.
+ * @str: The string to be searched.
+ * @delim: The delimiter character.
+ *
+ * Return: The number of words contained within str.
+ */
+
+int count_tokens(char *str, char *delim)
+{
+    int tokens = 0;
+    int index = 0;
+
+    while (str[index]) {
+        while (str[index] == *delim)
+            index++;
+
+        if (str[index] != '\0') {
+            tokens++;
+            index += token_len(str + index, delim);
+        }
+    }
+
+    return tokens;
 }
 

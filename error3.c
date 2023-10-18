@@ -1,120 +1,134 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include "shell.h"
 
-char *create_error_message(const char *format, ...);
+char *error_env(char **args);
+char *error_1(char **args);
+char *error_2_exit(char **args);
+char *error_2_cd(char **args);
+char *error_2_syntax(char **args);
 
 /**
- * create_error_message - Creates an error message with variable arguments.
- * @format: The format string for the error message.
- * @...: Variable arguments to be inserted into the format string.
- *
- * Return: The error string.
+ * error_env - Creates an error message for shellby_env errors.
  */
-char *create_error_message(const char *format, ...)
+char *error_env(char **args)
 {
-    char *error = NULL;
-    va_list args;
+	int len;
+	char *error;
+    char *hist_str = _itoa(hist);
 
-    va_start(args, format);
-    int len = vsnprintf(NULL, 0, format, args);
-    va_end(args);
+    if (!hist_str)
+        return NULL;
 
-    if (len < 0) {
-        return NULL; // Handle vsnprintf error
+    len = _strlen(name) + _strlen(hist_str) + _strlen(args[0]) + 45;
+    error = malloc(len + 1);
+
+    if (!error)
+    {
+        free(hist_str);
+        return NULL;
     }
 
-    error = (char *)malloc(len + 1); // Allocate memory for the error message
-    if (!error) {
-        return NULL; // Handle memory allocation failure
+    snprintf(error, len + 1, "%s: %s: %s: Unable to add/remove from environment\n", name, hist_str, args[0]);
+    free(hist_str);
+
+    return error;
+}
+
+/**
+ * error_1 - Creates an error message for shellby_alias errors.
+ */
+char *error_1(char **args)
+{
+    int len = _strlen(name) + _strlen(args[0]) + 13;
+    char *error = malloc(len + 1);
+
+    if (!error)
+        return NULL;
+
+    snprintf(error, len + 1, "alias: %s not found\n", args[0]);
+
+    return error;
+}
+
+/**
+ * error_2_exit - Creates an error message for shellby_exit errors.
+ */
+char *error_2_exit(char **args)
+{
+	int len;
+	char *error;;
+    char *hist_str = _itoa(hist);
+
+    if (!hist_str)
+        return NULL;
+
+    len = _strlen(name) + _strlen(hist_str) + _strlen(args[0]) + 27;
+    error = malloc(len + 1);
+
+    if (!error)
+    {
+        free(hist_str);
+        return NULL;
     }
 
-    va_start(args, format);
-    vsnprintf(error, len + 1, format, args);
-    va_end(args);
+    snprintf(error, len + 1, "%s: %s: exit: Illegal number: %s\n", name, hist_str, args[0]);
+    free(hist_str);
 
     return error;
 }
 
-char *create_error_env(const char *name, int hist, const char *arg)
+/**
+ * error_2_cd - Creates an error message for shellby_cd errors.
+ */
+char *error_2_cd(char **args)
 {
-    char hist_str[32];
-    snprintf(hist_str, sizeof(hist_str), "%d", hist);
+	char *type;
+	int len;
+	char *error;
+    char *hist_str = _itoa(hist);
 
-    char *error = create_error_message("%s: %s: %s: Unable to add/remove from environment\n", name, hist_str, arg);
+    if (!hist_str)
+        return NULL;
 
-    return error;
-}
+    type = (args[0][0] == '-') ? "cd: Illegal option" : "cd: can't cd to";
+    len = _strlen(name) + _strlen(hist_str) + _strlen(args[0]) + 24;
+    error = malloc(len + 1);
 
-char *create_error_1(const char *alias)
-{
-    return create_error_message("alias: %s not found\n", alias);
-}
-
-char *create_error_2_exit(const char *name, int hist, const char *illegalNum)
-{
-    char hist_str[32];
-    snprintf(hist_str, sizeof(hist_str), "%d", hist);
-
-    char *error = create_error_message("%s: %s: exit: Illegal number: %s\n", name, hist_str, illegalNum);
-
-    return error;
-}
-
-char *create_error_2_cd(const char *name, int hist, const char *cdPath)
-{
-    char hist_str[32];
-    snprintf(hist_str, sizeof(hist_str), "%d", hist);
-
-    char *error = NULL;
-
-    if (cdPath[0] == '-') {
-        error = create_error_message("%s: %s: cd: Illegal option %s\n", name, hist_str, cdPath);
-    }
-    else {
-        error = create_error_message("%s: %s: cd: can't cd to %s\n", name, hist_str, cdPath);
+    if (!error)
+    {
+        free(hist_str);
+        return NULL;
     }
 
+    snprintf(error, len + 1, "%s: %s: %s %s\n", name, hist_str, type, args[0]);
+    free(hist_str);
+
     return error;
 }
 
-char *create_error_2_syntax(const char *name, int hist, const char *unexpected)
+/**
+ * error_2_syntax - Creates an error message for syntax errors.
+ */
+char *error_2_syntax(char **args)
 {
-    char hist_str[32];
-    snprintf(hist_str, sizeof(hist_str), "%d", hist);
+	int len;
+	char *error;
+    char *hist_str = _itoa(hist);
 
-    char *error = create_error_message("%s: %s: Syntax error: \"%s\" unexpected\n", name, hist_str, unexpected);
+    if (!hist_str)
+        return NULL;
+
+    len = _strlen(name) + _strlen(hist_str) + _strlen(args[0]) + 33;
+    error = malloc(len + 1);
+
+    if (!error)
+    {
+        free(hist_str);
+        return NULL;
+    }
+
+    snprintf(error, len + 1, "%s: %s: Syntax error: \"%s\" unexpected\n", name, hist_str, args[0]);
+    free(hist_str);
 
     return error;
 }
 
-int main() {
-    // Example usage of the error functions
-    const char *name = "myshell";
-    int hist = 42;
-    const char *arg = "arg1";
-    const char *alias = "myalias";
-    const char *illegalNum = "abc";
-    const char *cdPath = "-option";
-    const char *unexpected = "invalid";
-
-    char *error1 = create_error_env(name, hist, arg);
-    char *error2 = create_error_1(alias);
-    char *error3 = create_error_2_exit(name, hist, illegalNum);
-    char *error4 = create_error_2_cd(name, hist, cdPath);
-    char *error5 = create_error_2_syntax(name, hist, unexpected);
-
-    printf("Error 1: %s\n", error1);
-    printf("Error 2: %s\n", error2);
-    printf("Error 3: %s\n", error3);
-    printf("Error 4: %s\n", error4);
-    printf("Error 5: %s\n", error5);
-
-    free(error1);
-    free(error2);
-    free(error3);
-    free(error4);
-    free(error5);
-
-    return 0;
-}

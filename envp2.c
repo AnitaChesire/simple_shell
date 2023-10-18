@@ -6,7 +6,6 @@ extern char **environ;
 
 char **_copyenv(void);
 void _freeenv(char **env);
-char *_getenv(const char *var);
 
 /**
  * _copyenv - Creates a copy of the environment.
@@ -17,7 +16,7 @@ char *_getenv(const char *var);
 char **_copyenv(void)
 {
     char **new_env = NULL;
-    int index = 0;
+    int j, index = 0;
 
     while (environ[index] != NULL)
     {
@@ -38,7 +37,7 @@ char **_copyenv(void)
         if (new_env[index] == NULL)
         {
             perror("Memory allocation error");
-            for (int j = index - 1; j >= 0; j--)
+            for (j = index - 1; j >= 0; j--)
                 free(new_env[j]);
             free(new_env);
             return (NULL);
@@ -54,10 +53,12 @@ char **_copyenv(void)
  */
 void _freeenv(char **env)
 {
+	int index;
+
     if (env == NULL)
         return;
 
-    for (int index = 0; env[index] != NULL; index++)
+    for (index = 0; env[index] != NULL; index++)
     {
         free(env[index]);
     }
@@ -71,15 +72,16 @@ void _freeenv(char **env)
  * Return: If the environmental variable does not exist - NULL.
  *         Otherwise - a pointer to the environmental variable value.
  */
-char *_getenv(const char *var)
+char **_getenv(const char *var)
 {
-    int len = strlen(var);
+	int index;
 
-    for (int index = 0; environ[index] != NULL; index++)
+    for (index = 0; environ[index]; index++)
     {
-        if (strncmp(var, environ[index], len) == 0 && environ[index][len] == '=')
-            return &environ[index][len + 1];
+        if (strstr(environ[index], var) == environ[index])
+            return (&environ[index]);
     }
 
-    return (NULL);
+    return NULL;
 }
+

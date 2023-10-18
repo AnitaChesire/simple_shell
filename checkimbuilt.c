@@ -1,57 +1,83 @@
 #include "shell.h"
 
-void help(char *command);
+void help_all(void);
+void help_alias(void);
+void help_cd(void);
+void help_exit(void);
+void help_help(void);
 
 /**
- * help - Displays help information for a specific shellby command.
+ * help_all - Displays all possible built-in shellby commands.
  */
-void help(char *command)
+void help_all(void)
 {
-    if (command == NULL || strcmp(command, "help") == 0) {
-        char *msg = "Shellby\nThese shell commands are defined internally.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
+    char *msg =
+        "Shellby\nThese shell commands are defined internally.\n"
+        "Type 'help' to see this list.\nType 'help name' to find out "
+        "more about the function 'name'.\n\n"
+        "  alias    \talias [NAME[='VALUE'] ...]\n"
+        "  cd       \tcd [DIRECTORY]\n"
+        "  exit     \texit [STATUS]\n"
+        "  env      \tenv\n"
+        "  setenv   \tsetenv [VARIABLE] [VALUE]\n"
+        "  unsetenv \tunsetenv [VARIABLE]\n";
 
-        msg = "Type 'help' to see this list.\nType 'help [COMMAND]' to find out more about a specific command.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-
-        msg = "  alias      - Handles aliases.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-        msg = "  cd         - Changes the current directory.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-        msg = "  exit       - Exits the shell.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-        msg = "  env        - Displays environment variables.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-        msg = "  setenv     - Sets an environment variable.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-        msg = "  unsetenv   - Unsets an environment variable.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-    } else if (strcmp(command, "alias") == 0) {
-        char *msg = "alias: alias [NAME[='VALUE'] ...]\n\tHandles aliases.\n";
-        // Display help information for the 'alias' command.
-        write(STDOUT_FILENO, msg, strlen(msg));
-    } else if (strcmp(command, "cd") == 0) {
-        char *msg = "cd: cd [DIRECTORY]\n\tChanges the current directory.\n";
-        // Display help information for the 'cd' command.
-        write(STDOUT_FILENO, msg, strlen(msg));
-    } else if (strcmp(command, "exit") == 0) {
-        char *msg = "exit: exit [STATUS]\n\tExits the shell.\n";
-        // Display help information for the 'exit' command.
-        write(STDOUT_FILENO, msg, strlen(msg));
-    } else if (strcmp(command, "env") == 0) {
-        char *msg = "env: env\n\tDisplays environment variables.\n";
-        // Display help information for the 'env' command.
-        write(STDOUT_FILENO, msg, strlen(msg));
-    } else if (strcmp(command, "setenv") == 0) {
-        char *msg = "setenv: setenv [VARIABLE] [VALUE]\n\tSets an environment variable.\n";
-        // Display help information for the 'setenv' command.
-        write(STDOUT_FILENO, msg, strlen(msg));
-    } else if (strcmp(command, "unsetenv") == 0) {
-        char *msg = "unsetenv: unsetenv [VARIABLE]\n\tUnsets an environment variable.\n";
-        // Display help information for the 'unsetenv' command.
-        write(STDOUT_FILENO, msg, strlen(msg));
-    } else {
-        char *msg = "Unknown command: Use 'help' to see the list of available commands.\n";
-        write(STDOUT_FILENO, msg, strlen(msg));
-    }
+    write(STDOUT_FILENO, msg, _strlen(msg));
 }
+
+/**
+ * help_alias - Displays information on the shellby built-in command 'alias'.
+ */
+void help_alias(void)
+{
+    char *msg =
+        "alias: alias [NAME[='VALUE'] ...]\n"
+        "    Handles aliases.\n\n"
+        "    alias: Prints a list of all aliases, one per line, in the format NAME='VALUE'.\n"
+        "    alias name [name2 ...]: prints the aliases name, name2, etc. one per line, in the form NAME='VALUE'.\n"
+        "    alias NAME='VALUE' [...]: Defines an alias for each NAME whose VALUE is given. If NAME is already an alias, replace its value with VALUE.\n";
+
+    write(STDOUT_FILENO, msg, _strlen(msg));
+}
+
+/**
+ * help_cd - Displays information on the shellby built-in command 'cd'.
+ */
+void help_cd(void)
+{
+    char *msg =
+        "cd: cd [DIRECTORY]\n"
+        "    Changes the current directory of the process to DIRECTORY.\n\n"
+        "    If no argument is given, the command is interpreted as cd $HOME. If the argument '-' is given, the command is interpreted as cd $OLDPWD.\n\n"
+        "    The environment variables PWD and OLDPWD are updated after a change of directory.\n";
+
+    write(STDOUT_FILENO, msg, _strlen(msg));
+}
+
+/**
+ * help_exit - Displays information on the shellby built-in command 'exit'.
+ */
+void help_exit(void)
+{
+    char *msg =
+        "exit: exit [STATUS]\n"
+        "    Exits the shell.\n\n"
+        "    The STATUS argument is the integer used to exit the shell. If no argument is given, the command is interpreted as exit 0.\n";
+
+    write(STDOUT_FILENO, msg, _strlen(msg));
+}
+
+/**
+ * help_help - Displays information on the shellby built-in command 'help'.
+ */
+void help_help(void)
+{
+    char *msg =
+        "help: help\n"
+        "    See all possible Shellby built-in commands.\n\n"
+        "    help [BUILTIN NAME]\n"
+        "    See specific information on each built-in command.\n";
+
+    write(STDOUT_FILENO, msg, _strlen(msg));
+}
+

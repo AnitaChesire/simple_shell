@@ -1,100 +1,92 @@
 #include "shell.h"
-#include <stdlib.h>
-#include <string.h>
 
-#define INITIAL_BUFFER_SIZE 120
+int _strlen(const char *s);
+char *_strcpy(char *dest, const char *src);
+char *_strcat(char *dest, const char *src);
+char *_strncat(char *dest, const char *src, size_t n);
 
-void *_realloc(void *ptr, size_t old_size, size_t new_size);
-void assign_lineptr(char **lineptr, size_t *n, char *buffer, size_t b);
-ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-
-void *_realloc(void *ptr, size_t old_size, size_t new_size)
+/**
+ * _strlen - Returns the length of a string.
+ * @s: A pointer to the characters string.
+ *
+ * Return: The length of the character string.
+ */
+int _strlen(const char *s)
 {
-    if (new_size == old_size)
-        return ptr;
+    int length = 0;
 
-    void *mem = malloc(new_size);
+    if (!s)
+        return length;
 
-    if (mem == NULL)
-    {
-        if (ptr != NULL)
-            free(ptr);
-        return NULL;
-    }
+    while (s[length] != '\0')
+        length++;
 
-    if (ptr != NULL)
-    {
-        size_t copy_size = (new_size < old_size) ? new_size : old_size;
-        memcpy(mem, ptr, copy_size);
-        free(ptr);
-    }
-
-    return mem;
+    return length;
 }
 
-void assign_lineptr(char **lineptr, size_t *n, char *buffer, size_t b)
+/**
+ * _strcpy - Copies the string pointed to by src to dest.
+ * @dest: Pointer to the destination of copied string.
+ * @src: Pointer to the source string.
+ *
+ * Return: Pointer to dest.
+ */
+char *_strcpy(char *dest, const char *src)
 {
-    if (*lineptr == NULL || b > *n)
-    {
-        // Allocate new memory if needed
-        size_t new_size = (b > INITIAL_BUFFER_SIZE) ? b : INITIAL_BUFFER_SIZE;
-        *lineptr = _realloc(*lineptr, *n, new_size);
-        *n = new_size;
+    size_t i = 0;
+
+    while (src[i] != '\0') {
+        dest[i] = src[i];
+        i++;
     }
 
-    strcpy(*lineptr, buffer);
-    free(buffer);
+    dest[i] = '\0';
+    return dest;
 }
 
-ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
+/**
+ * _strcat - Concatenates two strings.
+ * @dest: Pointer to destination string.
+ * @src: Pointer to source string.
+ *
+ * Return: Pointer to destination string.
+ */
+char *_strcat(char *dest, const char *src)
 {
-    ssize_t ret = 0;
-    char c;
-    int r;
+    char *destTemp = dest;
 
-    if (lineptr == NULL || n == NULL)
-        return -1;
+    while (*destTemp)
+        destTemp++;
 
-    // Initialize variables
-    size_t input = 0;
-    *lineptr = NULL;
-    *n = 0;
-
-    while (1)
+    while (*src)
     {
-        r = fread(&c, 1, 1, stream);
-
-        if (r <= 0)
-        {
-            if (ret == 0)
-                ret = r;
-            break;
-        }
-
-        if (input >= *n)
-        {
-            // Resize the buffer as needed
-            size_t new_size = (*n == 0) ? INITIAL_BUFFER_SIZE : (*n) * 2;
-            *lineptr = _realloc(*lineptr, *n, new_size);
-            *n = new_size;
-        }
-
-        (*lineptr)[input] = c;
-        input++;
-
-        if (c == '\n')
-        {
-            ret = input;
-            break;
-        }
+        *destTemp = *src;
+        destTemp++;
+        src++;
     }
 
-    if (ret <= 0 && *lineptr != NULL)
-    {
-        free(*lineptr);
-        *lineptr = NULL;
-        *n = 0;
-    }
-
-    return ret;
+    *destTemp = '\0';
+    return dest;
 }
+
+/**
+ * _strncat - Concatenates n bytes from src to dest.
+ * @dest: Pointer to destination string.
+ * @src: Pointer to source string.
+ * @n: Number of bytes to copy from src.
+ *
+ * Return: Pointer to destination string.
+ */
+char *_strncat(char *dest, const char *src, size_t n)
+{
+    size_t dest_len = _strlen(dest);
+    size_t i;
+
+    for (i = 0; i < n && src[i] != '\0'; i++)
+        dest[dest_len + i] = src[i];
+
+    dest[dest_len + i] = '\0';
+
+    return dest;
+}
+

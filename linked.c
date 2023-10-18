@@ -1,12 +1,8 @@
 #include "shell.h"
+#include <string.h>
 
-alias_t *add_alias_end(alias_t **head, const char *name, const char *value);
-void free_alias_list(alias_t *head);
-list_t *add_node_end(list_t **head, const char *dir);
-void free_list(list_t *head);
-
-/**
- * add_alias_end - Adds a node to the end of an alias_t linked list.
+/*
+ * alias_t *alias_end - Adds a node to the end of an alias_t linked list.
  * @head: A pointer to the head of the alias_t list.
  * @name: The name of the new alias to be added.
  * @value: The value of the new alias to be added.
@@ -14,36 +10,33 @@ void free_list(list_t *head);
  * Return: If an error occurs - NULL.
  *         Otherwise - a pointer to the new node.
  */
-alias_t *add_alias_end(alias_t **head, const char *name, const char *value)
+alias_t *add_alias_end(alias_t **head, char *name, char *value)
 {
-	alias_t *current;
-	alias_t *new_node;
+	alias_t *last;
 
-    new_node = malloc(sizeof(alias_t));
-    if (!new_node) {
+    alias_t *new_node = malloc(sizeof(alias_t));
+
+    if (!new_node)
         return NULL;
-    }
 
-    new_node->name = _strdup(name);
-    new_node->value = _strdup(value);
     new_node->next = NULL;
-
-    if (!new_node->name || !new_node->value) {
-        free(new_node->name);
-        free(new_node->value);
+    new_node->name = strdup(name);
+    if (!new_node->name)
+    {
         free(new_node);
         return NULL;
     }
+    new_node->value = strdup(value);
 
-    if (*head == NULL) {
-        *head = new_node;
-    } else {
-        current = *head;
-        while (current->next) {
-            current = current->next;
-        }
-        current->next = new_node;
+    if (*head)
+    {
+        last = *head;
+        while (last->next != NULL)
+            last = last->next;
+        last->next = new_node;
     }
+    else
+        *head = new_node;
 
     return new_node;
 }
@@ -56,29 +49,25 @@ alias_t *add_alias_end(alias_t **head, const char *name, const char *value)
  * Return: If an error occurs - NULL.
  *         Otherwise - a pointer to the new node.
  */
-list_t *add_node_end(list_t **head, const char *dir)
+list_t *add_node_end(list_t **head, char *dir)
 {
-	list_t *current;
-	list_t *new_node;
+    list_t *new_node = malloc(sizeof(list_t));
 
-    new_node = malloc(sizeof(list_t));
-    if (!new_node) {
+    if (!new_node)
         return NULL;
-    }
 
-    new_node->dir = _strdup(dir);
+    new_node->dir = dir;
     new_node->next = NULL;
 
-    if (!new_node->dir) {
-        free(new_node);
-        return NULL;
-    }
-
-    if (*head == NULL) {
+    if (*head == NULL)
+    {
         *head = new_node;
-    } else {
-        current = *head;
-        while (current->next) {
+    }
+    else
+    {
+        list_t *current = *head;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = new_node;

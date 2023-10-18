@@ -1,6 +1,5 @@
 #include "shell.h"
 
-void *_realloc(void *ptr, size_t old_size, size_t new_size);
 void assign_lineptr(char **lineptr, size_t *n, char *buffer, size_t b);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 
@@ -14,23 +13,17 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
  *         If new_size == 0 and ptr is not NULL - NULL.
  *         Otherwise - a pointer to the reallocated memory block.
  */
-void *_realloc(void *ptr, size_t old_size, size_t new_size)
+
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 {
     void *mem;
+    char *ptr_copy;
+    unsigned int size_to_copy, index;
 
     if (new_size == old_size)
         return ptr;
 
-    if (ptr == NULL)
-    {
-        mem = malloc(new_size);
-        if (mem == NULL)
-            return NULL;
-        return mem;
-    }
-
-    if (new_size == 0)
-    {
+    if (new_size == 0 && ptr != NULL) {
         free(ptr);
         return NULL;
     }
@@ -39,12 +32,17 @@ void *_realloc(void *ptr, size_t old_size, size_t new_size)
     if (mem == NULL)
         return NULL;
 
-    // Copy the data from the old memory block to the new one
-    memcpy(mem, ptr, old_size < new_size ? old_size : new_size);
+    if (ptr != NULL) {
+        ptr_copy = ptr;
+        size_to_copy = (new_size < old_size) ? new_size : old_size;
+        for (index = 0; index < size_to_copy; index++)
+            ((char *)mem)[index] = ptr_copy[index];
+        free(ptr);
+    }
 
-    free(ptr);
     return mem;
 }
+
 
 /**
  * assign_lineptr - Reassigns the lineptr variable for _getline.
@@ -55,10 +53,12 @@ void *_realloc(void *ptr, size_t old_size, size_t new_size)
  */
 void assign_lineptr(char **lineptr, size_t *n, char *buffer, size_t b)
 {
+	size_t new_size;
+
     if (*lineptr == NULL || b > *n)
     {
-        // Allocate new memory if needed
-        size_t new_size = b > 120 ? b : 120;
+        /* Allocate new memory if needed*/
+        new_size = b > 120 ? b : 120;
         *lineptr = _realloc(*lineptr, *n, new_size);
         *n = new_size;
     }
@@ -77,15 +77,15 @@ void assign_lineptr(char **lineptr, size_t *n, char *buffer, size_t b)
  */
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 {
-    ssize_t ret = 0;
+    ssize_t input, new_size, ret = 0;
     char c;
     int r;
 
     if (lineptr == NULL || n == NULL)
         return -1;
 
-    // Initialize variables
-    size_t input = 0;
+    /* Initialize variables*/
+    input = 0;
     *lineptr = NULL;
     *n = 0;
 
@@ -102,8 +102,8 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 
         if (input >= *n)
         {
-            // Resize the buffer as needed
-            size_t new_size = *n == 0 ? 120 : (*n) * 2;
+            /* Resize the buffer as needed*/
+             new_size = *n == 0 ? 120 : (*n) * 2;
             *lineptr = _realloc(*lineptr, *n, new_size);
             *n = new_size;
         }

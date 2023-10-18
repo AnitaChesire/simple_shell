@@ -14,104 +14,86 @@ void logical_ops(char *line, ssize_t *new_len);
  */
 void handle_line(char **line, ssize_t read)
 {
-    char *new_line = malloc((2 * read) + 1);
-    if (!new_line)
-    {
-        free(*line);
+    size_t i, j;
+    char *old_line, *new_line;
+    ssize_t new_len;
+
+    new_len = get_new_len(*line);
+    if (new_len == read - 1)
         return;
-    }
 
-    char previous = ' ', current, next;
-    size_t j = 0;
+    new_line = malloc(new_len + 1);
+    if (!new_line)
+        return;
 
-    for (size_t i = 0; i < read; i++)
+    j = 0;
+    old_line = *line;
+
+    for (i = 0; old_line[i]; i++)
     {
-        current = (*line)[i];
-        next = (i < read - 1) ? (*line)[i + 1] : ' ';
-
-        if (current == ';' || current == '&' || current == '|')
+        new_line[j++] = old_line[i];
+        if (old_line[i] == ';')
         {
-            if (previous != ' ')
+            if (i != 0 && old_line[i - 1] != ' ')
                 new_line[j++] = ' ';
-            new_line[j++] = current;
-            if (next != ' ')
+            if (old_line[i + 1] != ' ' && old_line[i + 1] != ';')
                 new_line[j++] = ' ';
         }
-        else if (current == '#')
-        {
-            new_line[j++] = '\0';
-            break;
-        }
-        else
-        {
-            new_line[j++] = current;
-        }
-
-        previous = current;
     }
 
     new_line[j] = '\0';
+
     free(*line);
     *line = new_line;
 }
 
-/**
- * get_new_len - Gets the new length of a line partitioned
- *               by ";", "||", "&&", or "#".
- * @line: The line to check.
- *
- * Return: The new length of the line.
- *
- * Description: Cuts short lines containing '#' comments with '\0'.
- */
 ssize_t get_new_len(char *line)
 {
+    size_t i;
     ssize_t new_len = 0;
-    char previous = ' ', current, next;
+    char current, next;
 
-    for (size_t i = 0; line[i]; i++)
+    for (i = 0; line[i]; i++)
     {
         current = line[i];
-        next = (line[i + 1]) ? line[i + 1] : ' ';
+        next = line[i + 1];
 
-        if (current == '#' && previous == ' ')
+        if (i != 0 && current == ';')
         {
-            line[i] = '\0';
-            break;
-        }
-        else if (current == ';' || current == '&' || current == '|')
-        {
-            if (previous != ' ')
+            if (next == ';' && line[i - 1] != ' ' && line[i - 1] != ';')
+            {
+                new_len += 2;
+                continue;
+            }
+            else if (line[i - 1] == ';' && next != ' ')
+            {
+                new_len += 2;
+                continue;
+            }
+            if (line[i - 1] != ' ')
                 new_len++;
             if (next != ' ')
                 new_len++;
         }
-        else
+
+        if (current == '&')
         {
-            new_len++;
+            if (next == '&' && line[i - 1] != ' ')
+                new_len++;
+            else if (line[i - 1] == '&' && next != ' ')
+                new_len++;
+        }
+        else if (current == '|')
+        {
+            if (next == '|' && line[i - 1] != ' ')
+                new_len++;
+            else if (line[i - 1] == '|' && next != ' ')
+                new_len++;
         }
 
-        previous = current;
+        new_len++;
     }
 
     return new_len;
-}
-
-/**
- * logical_ops - Checks a line for logical operators "||" or "&&".
- * @line: A pointer to the character to check in the line.
- * @new_len: Pointer to new_len in get_new_len function.
- */
-void logical_ops(char *line, ssize_t *new_len)
-{
-    char previous = *(line - 1);
-    char current = *line;
-    char next = *(line + 1);
-
-    if ((current == '&' && next == '&' && previous != ' ') ||
-        (current == '|' && next == '|' && previous != ' '))
-    {
-        (*new_len)++;
-    }
 }
 

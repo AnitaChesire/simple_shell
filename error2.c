@@ -1,70 +1,61 @@
-#include "shell.h
-"#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "shell.h"
 
-char *error_message(int error_code, const char *name, const char *hist_str, const char *arg);
+char *error_126(char **args);
+char *error_127(char **args);
 
 /**
- * error_message - Creates an error message for various error codes.
- * @error_code: The error code for which to generate an error message.
- * @name: The name associated with the error.
- * @hist_str: The history string.
- * @arg: The argument associated with the error.
- *
- * Return: The error message string.
+ * error_126 - Creates an error message for permission denied failures.
  */
-char *error_message(int error_code, const char *name, const char *hist_str, const char *arg)
+char *error_126(char **args)
 {
-    if (!name || !hist_str || !arg)
+	int len;
+	char *error;
+    char *hist_str;
+    
+    hist_str = _itoa(hist);
+    if (!hist_str)
         return NULL;
 
-    int len = strlen(name) + strlen(hist_str) + strlen(arg) + 24; // Adjust the length as needed
-    char *error = (char *)malloc(sizeof(char) * (len + 1));
+    len = _strlen(name) + _strlen(hist_str) + _strlen(args[0]) + 24;
+    error = malloc(len + 1);
 
     if (!error)
+    {
+        free(hist_str);
         return NULL;
+    }
 
-    strcpy(error, name);
-    strcat(error, ": ");
-    strcat(error, hist_str);
-    strcat(error, ": ");
-    strcat(error, arg);
-
-    if (error_code == 126)
-    {
-        strcat(error, ": Permission denied\n");
-    }
-    else if (error_code == 127)
-    {
-        strcat(error, ": not found\n");
-    }
-    else
-    {
-        strcat(error, ": Unknown error\n");
-    }
+    snprintf(error, len + 1, "%s: %s: %s: Permission denied\n", name, hist_str, args[0]);
+    free(hist_str);
 
     return error;
 }
 
-int main()
+/**
+ * error_127 - Creates an error message for command not found failures.
+ */
+char *error_127(char **args)
 {
-    const char *name = "Program";
-    const char *hist_str = "42";
-    const char *arg = "file.txt";
-    int error_code = 127;
+	char *hist_str;
+	int len;
+	char *error;
 
-    char *error_msg = error_message(error_code, name, hist_str, arg);
+    hist_str = _itoa(hist);
+    if (!hist_str)
+        return NULL;
 
-    if (error_msg)
+    len = _strlen(name) + _strlen(hist_str) + _strlen(args[0]) + 16;
+    error = malloc(len + 1);
+
+    if (!error)
     {
-        printf("Error message: %s", error_msg);
-        free(error_msg);
-    }
-    else
-    {
-        printf("Error message creation failed.\n");
+        free(hist_str);
+        return NULL;
     }
 
-    return 0;
+    snprintf(error, len + 1, "%s: %s: %s: not found\n", name, hist_str, args[0]);
+    free(hist_str);
+
+    return error;
 }
+

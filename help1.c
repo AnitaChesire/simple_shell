@@ -24,7 +24,7 @@ char *get_args(char *line, int *exe_ret)
     if (line)
     {
         free(line);
-        line = NULL; // Set to NULL after freeing to avoid double free
+        line = NULL;
     }
 
     while (1)

@@ -61,7 +61,7 @@ char *get_env_value(const char *var)
 void variable_replacement(char **line, int *exe_ret)
 {
     char *old_line = *line;
-    char *var, *value; *pid,*ret;
+    char *var, *value, *pid, *ret;
     int k, i, j;
      char *new_line = malloc(2 * _strlen(old_line) + 1);
 
@@ -91,7 +91,7 @@ void variable_replacement(char **line, int *exe_ret)
                 while (old_line[k] && old_line[k] != '$' && old_line[k] != ' ') {
                     k++;
                 }
-                var = _strndup(&old_line[i + 1], k - i - 1);
+                var = strndup(&old_line[i + 1], k - i - 1);
                 value = get_env_value(var);
                 _strcpy(&new_line[j], value);
                 j += _strlen(value);
