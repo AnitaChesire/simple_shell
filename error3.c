@@ -84,7 +84,9 @@ char *error_2_cd(char **args)
 	char *type;
 	int len;
 	char *error;
-    char *hist_str = _itoa(hist);
+	char *hist_str;
+
+    hist_str = _itoa(hist);
 
     if (!hist_str)
         return NULL;
@@ -112,7 +114,9 @@ char *error_2_syntax(char **args)
 {
 	int len;
 	char *error;
-    char *hist_str = _itoa(hist);
+	char *hist_str;
+
+    hist_str = _itoa(hist);
 
     if (!hist_str)
         return NULL;

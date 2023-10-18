@@ -75,19 +75,17 @@ void assign_lineptr(char **lineptr, size_t *n, char *buffer, size_t b)
  *
  * Return: The number of bytes read.
  */
+
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 {
-    ssize_t input, new_size, ret = 0;
+    ssize_t ret = 0;
+    char *buffer = NULL;
+    size_t bufsize = 0;
     char c;
     int r;
 
     if (lineptr == NULL || n == NULL)
         return -1;
-
-    /* Initialize variables*/
-    input = 0;
-    *lineptr = NULL;
-    *n = 0;
 
     while (1)
     {
@@ -100,30 +98,36 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
             break;
         }
 
-        if (input >= *n)
+        if ((size_t)ret >= bufsize)
         {
-            /* Resize the buffer as needed*/
-             new_size = *n == 0 ? 120 : (*n) * 2;
-            *lineptr = _realloc(*lineptr, *n, new_size);
-            *n = new_size;
+            bufsize = bufsize == 0 ? 120 : bufsize * 2;
+            buffer = _realloc(buffer, bufsize, bufsize + 1);
+
+            if (buffer == NULL)
+            {
+                free(buffer);
+                return -1;
+            }
         }
 
-        (*lineptr)[input] = c;
-        input++;
+        buffer[ret] = c;
+        ret++;
 
         if (c == '\n')
-        {
-            ret = input;
             break;
-        }
     }
 
-    if (ret <= 0 && *lineptr != NULL)
+    if (ret <= 0 && buffer != NULL)
     {
-        free(*lineptr);
+        free(buffer);
         *lineptr = NULL;
         *n = 0;
+    }
+    else
+    {
+        assign_lineptr(lineptr, n, buffer, ret);
     }
 
     return ret;
 }
+

@@ -10,23 +10,23 @@
  * Description: Prints one variable per line in the
  *              format 'variable'='value'.
  */
+
 int shellby_env(char **args, char __attribute__((__unused__)) **front)
 {
 	int index;
-	char nc = '\n';
 
-	if (!environ)
+	if (environ == NULL)
 		return (-1);
 
-	for (index = 0; environ[index]; index++)
+	for (index = 0; environ[index] != NULL; index++)
 	{
 		write(STDOUT_FILENO, environ[index], _strlen(environ[index]));
-		write(STDOUT_FILENO, &nc, 1);
+		write(STDOUT_FILENO, "\n", 1);
 	}
 
+	(void)args;
 	return (0);
 }
-
 /**
  * shellby_setenv - Changes or adds an environmental variable to the PATH.
  * @args: An array of arguments passed to the shell.
