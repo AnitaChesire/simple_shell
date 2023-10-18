@@ -49,10 +49,6 @@ char **_copyenv(void)
 }
 
 /**
- * _free_env - Frees the environment copy.
- */
-
-/**
  * free_env - Frees the environment copy.
  */
 void free_env(void)
