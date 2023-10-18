@@ -13,7 +13,9 @@ char *error_env(char **args)
 {
 	int len;
 	char *error;
-    char *hist_str = _itoa(hist);
+	char *hist_str;
+
+    	hist_str = _itoa(hist);
 
     if (!hist_str)
         return NULL;
@@ -56,7 +58,9 @@ char *error_2_exit(char **args)
 {
 	int len;
 	char *error;;
-    char *hist_str = _itoa(hist);
+	char *hist_str;
+	
+	hist_str = _itoa(hist);
 
     if (!hist_str)
         return NULL;
