@@ -49,21 +49,25 @@ char **_copyenv(void)
 }
 
 /**
- * _freeenv - Frees the environment copy.
+ * _free_env - Frees the environment copy.
  */
-void _freeenv(char **env)
+
+/**
+ * free_env - Frees the environment copy.
+ */
+void free_env(void)
 {
-	int index;
+    int index;
 
-    if (env == NULL)
-        return;
-
-    for (index = 0; env[index] != NULL; index++)
-    {
-        free(env[index]);
+    for (index = 0; environ[index]; index++) {
+        free(environ[index]);
+        environ[index] = NULL;  // Set the pointer to NULL after freeing
     }
-    free(env);
+
+    free(environ);
+    environ = NULL;  // Set the pointer to NULL after freeing
 }
+
 
 /**
  * _getenv - Gets an environmental variable from the environment copy.
