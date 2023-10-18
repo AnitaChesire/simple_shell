@@ -49,7 +49,7 @@ char **_copyenv(void)
 }
 
 /**
- * _freeenv - Frees the environment copy.
+ * free_env - Frees the environment copy.
  */
 void free_env(void)
 {
@@ -62,6 +62,14 @@ void free_env(void)
 		free(environ);
 		environ = NULL; 
 	}
+
+    for (index = 0; environ[index]; index++) {
+        free(environ[index]);
+        environ[index] = NULL;  
+    }
+
+    free(environ);
+    environ = NULL;  
 }
 
 
