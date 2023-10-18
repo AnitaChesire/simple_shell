@@ -56,9 +56,9 @@ char *error_1(char **args)
  */
 char *error_2_exit(char **args)
 {
-	int len;
-	char *error;;
 	char *hist_str;
+	int len;
+	char *error;
 	
 	hist_str = _itoa(hist);
 
