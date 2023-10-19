@@ -1,6 +1,8 @@
 #include "main.h"
 
 int _strcmp(const char *s1, const char *s2);
+int _setenv(const char *name, const char *value, int overwrite);
+int _unsetenv(const char *name);
 
 /**
  * exec - function that executes a command
@@ -29,7 +31,7 @@ void exec(char **argv, char *program_name)
                 fprintf(stderr, "%s: %d: usage: setenv VARIABLE VALUE\n", program_name, line_num);
                 return;
             }
-            if (setenv(argv[1], argv[2], 1) == -1)
+            if (_setenv(argv[1], argv[2], 1) == -1)
             {
                 perror("error in setenv");
                 return;
@@ -43,7 +45,7 @@ void exec(char **argv, char *program_name)
                 fprintf(stderr, "%s: %d: usage: unsetenv VARIABLE\n", program_name, line_num);
                 return;
             }
-            if (unsetenv(argv[1]) == -1)
+            if (_unsetenv(argv[1]) == -1)
             {
                 perror("There is an error in unsetenv");
                 return;
@@ -103,5 +105,33 @@ int _strcmp(const char *s1, const char *s2)
 		return (0);
 	}
 	
+}
+int _setenv(const char *name, const char *value, int overwrite)
+{
+	char *env_variable;
+	size_t size = strlen(name) + 1 + strlen(value) + 1;
+
+	if (getenv(name) != NULL && !overwrite)
+		return (0);
+	
+	env_variable = (char *)malloc(size);
+	if (env_variable == NULL)
+		return (-1);
+	
+	snprintf(env_variable, size, "%s=%s", name, value);
+	if (putenv(env_variable) != 0)
+	{
+		free(env_variable);
+		return (-1);
+	}
+	return (0);
+}
+
+int _unsetenv(const char *name)
+{
+	if (unsetenv(name) != 0)
+		return (-1);
+	
+    return (0);
 }
 
