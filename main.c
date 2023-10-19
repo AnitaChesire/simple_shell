@@ -1,73 +1,56 @@
-#include "shell.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
-/**
- * sig_handler - Prints a new prompt upon a signal.
- * @sig: The signal.
- */
-void sig_handler(int sig)
-{
-    char *new_prompt = "\n#cisfun$ ";
+#define MAX_COMMAND_LENGTH 100
 
-    (void)sig;
-    signal(SIGINT, sig_handler);
-    write(STDIN_FILENO, new_prompt, 10);
+int main() {
+    char input[MAX_COMMAND_LENGTH];
+    char *args[2];
+    int status;
+    pid_t pid;
+    
+    while (1) {
+               printf("simple_shell> ");
+        
+        
+        if (fgets(input, sizeof(input), stdin) == NULL) {
+        
+            printf("\n");
+            break;
+        }
+        
+        input[strcspn(input, "\n")] = 0;
+
+        pid = fork();
+        
+        if (pid < 0) {
+            perror("Fork failed");
+            exit(1);
+        }
+        
+        if (pid == 0) {
+                   args[0] = input;
+            args[1] = NULL;
+            
+                    if (execvp(input, args) == -1) {
+                perror("Execution failed");
+                exit(1);
+            }
+        } else {
+      
+
+            waitpid(pid, &status, 0);
+            
+            if (WIFEXITED(status)) {
+                printf("Child exited with status %d\n", WEXITSTATUS(status));
+            }
+        }
+    }
+    
+    return 0;
 }
 
-/**
- * main - Runs a simple UNIX command interpreter.
- * @argc: The number of arguments supplied to the program.
- * @argv: An array of pointers to the arguments.
- *
- * Return: The return value of the last executed command.
- */
-int main(int argc, char *argv[])
-{
-	int ret = 0, retn;
-	int *exe_ret = &retn;
-	char *prompt = "#cisfun$ ", *new_line = "\n";
-
-	name = argv[0];
-	hist = 1;
-	aliases = NULL;
-	signal(SIGINT, sig_handler);
-
-	*exe_ret = 0;
-	environ = _copyenv();
-	if (!environ)
-		exit(-100);
-
-	if (argc != 1)
-	{
-		ret = proc_file_commands(argv[1], exe_ret);
-		free_env();
-		free_alias_list(aliases);
-		return (*exe_ret);
-	}
-
-	if (!isatty(STDIN_FILENO))
-	{
-		while (ret != END_OF_FILE && ret != EXIT)
-			ret = handle_args(exe_ret);
-		free_env();
-		free_alias_list(aliases);
-		return (*exe_ret);
-	}
-
-	while (1)
-	{
-		write(STDOUT_FILENO, prompt, 10);
-		ret = handle_args(exe_ret);
-		if (ret == END_OF_FILE || ret == EXIT)
-		{
-			if (ret == END_OF_FILE)
-				write(STDOUT_FILENO, new_line, 10);
-			free_env();
-			free_alias_list(aliases);
-			exit(*exe_ret);
-		}
-	}
-
-	free_env();
-	free_alias_list(aliases);
-	return (*exe_ret);
-}
