@@ -17,7 +17,6 @@ while (1)
 {
 if (isatty(STDOUT_FILENO))
 write(STDOUT_FILENO, "", 1);
-/*            printf(" ");*/
 if (getline(&command, &buffer_size, stdin) == -1)
 {
 free(command);
@@ -50,9 +49,7 @@ else
 fprintf(stderr, "%s: %d: cd: %s: No such file or directory\n", av[0], line_nbr, directory);
 }
 else
-{
 exec(command_tokens, av[0]);
-}
 }
 free(command_tokens);
 }
