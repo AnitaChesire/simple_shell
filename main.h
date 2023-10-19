@@ -36,5 +36,7 @@ void env_func(void);
 char **strtok_cmd(char *command);
 int isatty(int fd);
 int cd_func(char *argv[]);
+size_t _strlen(const char *str);
+int custom_strcmp(const char *s1, const char *s2);
 
 #endif

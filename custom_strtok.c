@@ -1,54 +1,39 @@
 #include "main.h"
 
 /**
- *custom_strtok - a custom strtok function
- *@string: the string to be tokenized
- *@delimiter: the delimiter
- *Return: tokenized string
+ * custom_strtok - A custom strtok function for tokenizing a string.
+ * @string: The string to be tokenized.
+ * @delimiter: The delimiter characters.
+ *
+ * Return: The next token from the string or NULL if there are no more tokens.
  */
-
 char *custom_strtok(char *string, const char *delimiter)
 {
-	/* pointing to the final token found in the string*/
-	static char *the_final_token;
+    char *last_token = NULL;
+    char *start;
 
-	/* if string is NULL, continue searching from the position*/
-	/* pointed by the final token */
+    if (string != NULL)
+        last_token = string;
 
-	if (string == NULL)
-	{
-		string = the_final_token;
+    if (last_token == NULL)
+        return NULL;
 
-	}
-	/* if string is still empty this means there are no more*/
-	/* tokens to extract */
-	if (string == NULL)
-	{
-		return (NULL);
-	}
-	/* find the start of the next token*/
-	string = string + strspn(string, delimiter);
+    while (*last_token != '\0' && strchr(delimiter, *last_token) != NULL)
+        last_token++;
 
-	if (*string ==  '\0')
-	{
-		return (NULL);
-	}
+    if (*last_token == '\0')
+    {
+        last_token = NULL;
+        return NULL;
+    }
 
-	/* here a check to see if the current character is ; */
-	if (*string == ';')
-	{
-		*the_final_token++ = *string++;
-		*the_final_token = '\0';
-		return (the_final_token - 1);
-	}
+    start = last_token;
+    while (*last_token != '\0' && strchr(delimiter, *last_token) == NULL)
+        last_token++;
 
-	/* find the end of the token*/
-	the_final_token = string + strcspn(string, delimiter);
-	if (*the_final_token != '\0')
-	{
-		*the_final_token++ = '\0';
-	}
+    if (*last_token != '\0')
+        *last_token++ = '\0';
 
-	return (string);
-
+    return start;
 }
+

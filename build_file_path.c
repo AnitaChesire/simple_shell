@@ -1,30 +1,26 @@
 #include "main.h"
 
 /**
- * path_builder - a function to help in building the file path
- * @dir: the directories
- * @command: the command name
- * Return: the file path of the directories
+ * path_builder - Build the file path using a directory and a command.
+ * @dir: The directory.
+ * @command: The command name.
+ *
+ * Return: The constructed file path.
  */
-
-
 char *path_builder(const char *dir, const char *command)
 {
-	char *the_file_path = NULL;
-	int dir_length, cmd_len;
+    int dir_length = strlen(dir);
+    int cmd_length = strlen(command);
+    char *file_path = malloc(dir_length + cmd_length + 2);
 
-	dir_length = strlen(dir);
+    if (file_path == NULL)
+    {
+        perror("malloc failed in path_builder");
+        exit(EXIT_FAILURE);
+    }
 
-	cmd_len = strlen(command);
+    sprintf(file_path, "%s/%s", dir, command);
 
-	the_file_path = (char *)malloc(dir_length + cmd_len + 2);
-
-	/*building path for the command*/
-	/* better than calling strcat and strcpy lots of times*/
-	sprintf(the_file_path, "%s/%s", dir, command);
-
-	return (the_file_path);
-
+    return file_path;
 }
-
 
