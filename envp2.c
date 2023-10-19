@@ -57,11 +57,11 @@ void free_env(void)
 
     for (index = 0; environ[index]; index++) {
         free(environ[index]);
-        environ[index] = NULL;  // Set the pointer to NULL after freeing
+        environ[index] = NULL;
     }
 
     free(environ);
-    environ = NULL;  // Set the pointer to NULL after freeing
+    environ = NULL;
 }
 
 
