@@ -24,7 +24,7 @@ else if (_strcmp(cmd, "setenv") == 0)
 {
 if (argv[1] == NULL || argv[2] == NULL || argv[3] != NULL)
 {
-fprintf(stderr, "%s: %d: usage: setenv VARIABLE VALUE\n", program_name, line_num);
+fprintf(stderr, "%s: %d: usage: setenv VARIABLE\n", program_name, line_num);
 return;
 }
 if (_setenv(argv[1], argv[2], 1) == -1)
