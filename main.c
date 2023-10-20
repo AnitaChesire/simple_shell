@@ -1,5 +1,8 @@
 #include "main.h"
 #define COMMAND_MAX_LENGTH 1024
+
+int handle_exit_command(char *command);
+
 /**
 * main - Main shell program
 * @ac: Number of command line arguments
@@ -29,7 +32,7 @@ if (strcmp(command, "exit\n") == 0)
 exit(EXIT_SUCCESS);
 if (strncmp(command, "exit ", 5) == 0)
 {
-status = atoi(command + 5);
+status = handle_exit_command(command);
 if (status >= 0)
 exit(status);
 fprintf(stderr, "%s: %d: exit: Illegal number: %d\n", av[0], line_nbr, status);
@@ -80,4 +83,14 @@ token = custom_strtok(NULL, " \n");
 command_tokens[q] = NULL;
 free(token);
 return (command_tokens);
+}
+/**
+ * handle_exit_command - exit
+ * @command: status
+ * Return: status
+ */
+int handle_exit_command(char *command)
+{
+	int status = atoi(command + 5);
+	return status;
 }
