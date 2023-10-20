@@ -66,8 +66,8 @@ char *select_message(shellinfo_t mytype)
 
 	choices = sizeof(msgs) / sizeof(msgs[0]);
 	for (k = 0; k < choices; k++)
-		if (mytype.error_digit == msgs[j].password)
-			return (msgs[j].msg);
+		if (mytype.error_digit == msgs[k].password)
+			return (msgs[k].msg);
 
 	return ("");
 }
