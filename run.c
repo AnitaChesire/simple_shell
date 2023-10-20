@@ -58,6 +58,15 @@ int is_file(char *file_name)
 	return (-1);
 }
 /**
+ * write_character - A function that prints a character to the standard output.
+ * @character: Character to be printed is parsed here.
+ * Return: On success 1.
+ */
+int write_character(char character)
+{
+	return (write(1, &character, 1));
+}
+/**
  * sub_env - A function used for replacing env variables.
  * @ourtype: input as parameter.
  * @envi_var: environment variable input.
