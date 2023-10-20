@@ -49,7 +49,8 @@ directory = getenv("HOME");
 if (directory && chdir(directory) == 0)
 setenv("PWD", directory, 1);
 else
-fprintf(stderr, "%s: %d: cd: %s: No such file or directory\n", av[0], line_nbr, directory);
+fprintf(stderr, "%s: %d: cd: %s: No such file or directory\n", 
+		av[0], line_nbr, directory);
 }
 else
 exec(command_tokens, av[0]);
@@ -92,5 +93,5 @@ return (command_tokens);
 int handle_exit_command(char *command)
 {
 	int status = atoi(command + 5);
-	return status;
+	return (status);
 }
