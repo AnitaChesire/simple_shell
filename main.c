@@ -16,6 +16,7 @@ size_t buffer_size = 0;
 int line_nbr = 1;
 char **command_tokens;
 int status;
+char *exit_command[] = {"exit", NULL};
 while (1)
 {
 if (isatty(STDOUT_FILENO))
@@ -29,13 +30,20 @@ if (command[0] == '#')
 continue;
 line_nbr++;
 if (strcmp(command, "exit\n") == 0)
-exit(EXIT_SUCCESS);
+{
+binary_exit(&ourtype, exit_command);
+}
 if (strncmp(command, "exit ", 5) == 0)
 {
 status = handle_exit_command(command);
 if (status >= 0)
 exit(status);
 fprintf(stderr, "%s: %d: exit: Illegal number: %d\n", av[0], line_nbr, status);
+continue;
+}
+if (strncmp(command, "alias", 5) == 0)
+{
+handle_alias_command(command);
 continue;
 }
 command_tokens = tokenize_command(command);
