@@ -1,3 +1,3 @@
-0x16.C - SIMPLE_SHELL Project
+0x16.C - SIMPLE_SHELL Project 
 
-ALX Team Project done by Augustine Jude and Mubarak Mubarak
+ALX Team Project done by Anita Bikambo and Puline Ondiek
